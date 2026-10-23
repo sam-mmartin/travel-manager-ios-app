@@ -12,7 +12,7 @@ import SwiftData
 struct travel_managerApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Trip.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -27,6 +27,9 @@ struct travel_managerApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(sharedModelContainer)
+        .modelContainer(for: [Trip.self,
+                              Expense.self,
+                              Parada.self,
+                              Ponto.self])
     }
 }
