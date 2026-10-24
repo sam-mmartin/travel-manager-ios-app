@@ -16,6 +16,8 @@ struct NewTripView: View {
     @State private var destino = ""
     @State private var inicio = Date()
     @State private var odometro: Double?
+    @State private var coordenada: Coordenada?
+    @State private var buscandoGPS = false
     
     private var podeSalvar: Bool {
         let nomeOk = !nome.trimmingCharacters(in: .whitespaces).isEmpty
@@ -42,6 +44,12 @@ struct NewTripView: View {
                     TextField("Odômetro inicial (km)", value: $odometro, format: .number)
                         .keyboardType(.decimalPad)
                 }
+                
+                Section("Localização da partida") {
+                    LocalizacaoCampoView(coordenada: $coordenada,
+                                         capturarAoAparecer: true,
+                                         buscando: $buscandoGPS)
+                }
             }
             .navigationTitle("Nova viagem")
             .navigationBarTitleDisplayMode(.inline)
@@ -51,16 +59,17 @@ struct NewTripView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Salvar") {
-                        let trip = Trip(nome: nome,
-                        origem: origem,
-                        destino: destino,
-                        inicio: inicio,
-                        odometroInicial: odometro ?? 0)
+                        Trip.criar(nome: nome.trimmingCharacters(in: .whitespaces),
+                                   origem: origem.trimmingCharacters(in: .whitespaces),
+                                   destino: destino.trimmingCharacters(in: .whitespaces),
+                                   horario: inicio,
+                                   odometro: odometro ?? 0,
+                                   coordenada: coordenada,
+                                   em: context)
                         
-                        context.insert(trip)
                         dismiss()
                     }
-                    .disabled(!podeSalvar)
+                    .disabled(!podeSalvar || buscandoGPS)
                 }
             }
         }

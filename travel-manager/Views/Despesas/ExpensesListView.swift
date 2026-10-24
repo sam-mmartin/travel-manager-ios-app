@@ -33,7 +33,7 @@ struct ExpensesListView: View {
             
             Section("Todas as despeas") {
                 ForEach(ordenadas) { d in
-                    ExpenseRow(despesa: d, consumo: trip.consumo(de: d))
+                    ExpenseRowView(despesa: d, consumo: trip.consumo(de: d))
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 context.delete(d)

@@ -36,7 +36,7 @@ struct KilometragemView: View {
                 Text("Odômetro")
             } footer: {
                 if !trip.chegou {
-                    Text("O odômetro atual é o maior valor registrado em pontos e despesas. O final é informado ao registrar a chegada.")
+                    Text("O odômetro atual é o maior valor registrado nos pontos. O final é informado ao registrar a chegada.")
             }
             }
         }
@@ -46,5 +46,5 @@ struct KilometragemView: View {
 }
 
 #Preview {
-    KilometragemView(trip: Trip(nome: "Teste", odometroInicial: 0))
+    KilometragemView(trip: Trip(nome: "Brasilia", destino: "Lago Verde"))
 }

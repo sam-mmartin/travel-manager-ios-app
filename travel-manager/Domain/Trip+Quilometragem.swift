@@ -9,19 +9,16 @@ import Foundation
 extension Trip {
     /// Odômetro final, se a viagem terminou; senão, o maior odômetro entre os pontos.
     var odometroAtual: Double {
-        if chegou, let odometroFinal { return odometroFinal }
         var maior = odometroInicial
         
-        for p in pontosOrdenados {
+        for p in pontosDoPercurso {
             maior = max(maior, p.odometro)
         }
     
         return maior
     }
     
-    var kmPercorrido: Double {
-        max(0, odometroAtual - odometroInicial)
-    }
+    var kmPercorrido: Double { percursoKm }
     
     var custoPorKm: Decimal? {
         guard kmPercorrido > 0 else { return nil}

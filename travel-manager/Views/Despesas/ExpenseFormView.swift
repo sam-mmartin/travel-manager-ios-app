@@ -30,12 +30,12 @@ struct ExpenseFormView: View {
         
         switch estado.modo {
         case .existente:
-            if estado.trip.pontosOrdenados.isEmpty {
+            if estado.trip.pontosDoPercurso.isEmpty {
                 Text("Nenhum ponto cadastrado. Use a opção Novo.")
                     .foregroundStyle(.secondary)
             } else {
                 Picker("Escolher ponto", selection: $estado.pontoID) {
-                    ForEach(estado.trip.pontosOrdenados) { p in
+                    ForEach(estado.trip.pontosDoPercurso) { p in
                         Text(estado.rotulo(p))
                             .tag(Optional(p.persistentModelID))
                     }

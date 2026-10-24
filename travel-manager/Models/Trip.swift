@@ -10,12 +10,8 @@ import SwiftData
 @Model
 final class Trip {
     var nome: String = ""
-    var inicio: Date = Date()
-    var fim: Date?
-    var odometroInicial: Double = 0
-    var odometroFinal: Double?
-    var origem: String = ""
     var destino: String = ""
+    var criadaEm: Date = Date()
     
     @Relationship(deleteRule: .cascade, inverse: \Expense.trip)
     var despesas: [Expense]? = []
@@ -26,12 +22,8 @@ final class Trip {
     @Relationship(deleteRule: .cascade, inverse: \Ponto.trip)
     var pontos: [Ponto]? = []
     
-    init(nome: String, origem: String = "", destino: String = "",
-         inicio: Date = .now, odometroInicial: Double = 0) {
+    init(nome: String, destino: String = "") {
         self.nome = nome
-        self.origem = origem
         self.destino = destino
-        self.inicio = inicio
-        self.odometroInicial = odometroInicial
     }
 }

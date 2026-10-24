@@ -8,26 +8,6 @@
 import Foundation
 import SwiftData
 
-enum Categoria: String, Codable, CaseIterable, Identifiable {
-    case combustivel = "Combustível"
-    case alimentacao = "Alimentação"
-    case hotel = "Hotel"
-    case pedagio = "Pedágio"
-    case outros = "Outros"
-    
-    var id: String {rawValue}
-    
-    var icone: String {
-        switch self {
-        case .combustivel: "fuelpump.fill"
-        case .alimentacao: "fork.knife"
-        case .hotel: "bed.double.fill"
-        case .pedagio: "road.lanes"
-        case .outros: "ellipsis.circle.fill"
-        }
-    }
-}
-
 @Model
 final class Expense {
     var categoria: Categoria = Categoria.outros

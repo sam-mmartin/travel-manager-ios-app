@@ -7,11 +7,6 @@
 import Foundation
 import SwiftData
 
-struct Coordenada: Equatable, Sendable {
-    var latitude: Double
-    var longitude: Double
-}
-
 @Model
 final class Ponto {
     var nome: String = ""
@@ -19,18 +14,21 @@ final class Ponto {
     var odometro: Double = 0
     var latitude: Double?
     var longitude: Double?
+    var tipo: TipoPonto = TipoPonto.intermediario
     var trip: Trip?
     
     @Relationship(deleteRule: .nullify, inverse: \Expense.ponto)
     var despesas: [Expense]? = []
     
     init(nome: String, horario: Date = .now, odometro: Double,
-         coordenada: Coordenada? = nil) {
+         coordenada: Coordenada? = nil,
+         tipo: TipoPonto = .intermediario) {
         self.nome = nome
         self.horario = horario
         self.odometro = odometro
         self.latitude = coordenada?.latitude
         self.longitude = coordenada?.longitude
+        self.tipo = tipo
     }
     
     var coordenada: Coordenada? {
@@ -53,28 +51,3 @@ final class Ponto {
     }
 }
 
-struct PontoPercurso {
-    let nome: String
-    let horario: Date
-    let odometro: Double
-}
-
-struct Trecho: Identifiable {
-    let id: Int
-    let origem: PontoPercurso
-    let destino: PontoPercurso
-    
-    var km: Double {
-        max(0, destino.odometro - origem.odometro)
-    }
-    
-    var duracao: TimeInterval {
-        max(0, destino.horario.timeIntervalSince(origem.horario))
-    }
-    
-    var velocidadeMedia: Double? {
-        guard km > 0, duracao > 0 else { return nil }
-        
-        return km / (duracao / 3600)
-    }
-}

@@ -72,7 +72,7 @@ struct TripDetailView: View {
                 }
                 
                 if let ultima = ultimaParada {
-                    ParadaRow(parada: ultima)
+                    ParadaRowView(parada: ultima)
                         .contentShape(Rectangle())
                         .onTapGesture {
                             paradaEditando = ultima
@@ -122,5 +122,5 @@ struct TripDetailView: View {
 }
 
 #Preview {
-    TripDetailView(trip: Trip(nome: "Start", odometroInicial: 0))
+    TripDetailView(trip: Trip(nome: "Brasilia", destino: "Lago Verde"))
 }

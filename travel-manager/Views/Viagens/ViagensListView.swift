@@ -10,7 +10,7 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var context
-    @Query(sort: \Trip.inicio, order: .reverse) private var viagens: [Trip]
+    @Query(sort: \Trip.criadaEm, order: .reverse) private var viagens: [Trip]
     @State private var criando = false
  
     var body: some View {
@@ -24,11 +24,15 @@ struct ContentView: View {
                                 .font(.subheadline).foregroundStyle(.secondary)
                         }
                     }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button(role: .destructive) {
+                            context.delete(viagem)
+                        } label: {
+                            Label("Excluir", systemImage: "trash")
+                        }
+                    }
                 }
-                .onDelete { offsets in
-                    offsets.map { _ in viagens[0]}.forEach(context.delete)
-                }
-            }
+             }
             .overlay {
                 if viagens.isEmpty {
                     ContentUnavailableView("Nenhuma viagem registrada.",

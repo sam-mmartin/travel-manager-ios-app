@@ -9,8 +9,10 @@ import SwiftData
 
 struct PercursoView: View {
     let trip: Trip
+    @Environment(\.modelContext) private var context
     @State private var novoPonto = false
     @State private var chegando = false
+    @State private var reabrindo = false
     
     private var statusTexto: String {
         trip.chegou ? "Concluída" : "Em andamento"
@@ -20,17 +22,8 @@ struct PercursoView: View {
         trip.trechos.last
     }
     
-    private var ultimoPonto: PontoPercurso? {
-        trip.percurso.last
-    }
-    
-    private var rotuloUltimoPonto: String? {
-        if trip.chegou { return "Chegada" }
-        if trip.pontosOrdenados.isEmpty {
-            return "Partida"
-        }
-        
-        return nil
+    private var ultimoPonto: Ponto? {
+        trip.pontosDoPercurso.last
     }
     
     var body: some View {
@@ -48,7 +41,7 @@ struct PercursoView: View {
                 }
             }
             
-            Section("Trechos") {
+            Section("Último trecho") {
                 if let trecho = ultimoTrecho {
                     TrechoRowView(trecho: trecho)
                 } else {
@@ -68,7 +61,8 @@ struct PercursoView: View {
                     PontoRowView(nome: ponto.nome,
                                  horario: ponto.horario,
                                  odometro: ponto.odometro,
-                                 rotulo: rotuloUltimoPonto)
+                                 rotulo: ponto.tipo.rotulo,
+                                 temLocalizacao: ponto.temLocalizacao)
                     
                 }
                 
@@ -77,23 +71,29 @@ struct PercursoView: View {
                 } label: {
                     Label("Ver todos os pontos", systemImage: "list.bullet")
                 }
+                
+                NavigationLink {
+                    MapaPontosView(trip: trip)
+                } label: {
+                    Label("Ver pontos no mapa",
+                          systemImage: "map")
+                }
             }
             
             Section {
                 if trip.chegou {
                     Button {
-                        trip.fim = nil
-                        trip.odometroFinal = nil
+                        reabrindo = true
                     } label: {
                         Label("Reabir viagem",
-                        systemImage: "arrow.uturn.backward")
+                              systemImage: "arrow.uturn.backward")
                     }
                 } else {
                     Button {
                         chegando = true
                     } label: {
                         Label("Registrar chegada em " + trip.destinoNome,
-                        systemImage: "flag.checkered")
+                              systemImage: "flag.checkered")
                     }
                 }
             }
@@ -112,6 +112,15 @@ struct PercursoView: View {
         }
         .sheet(isPresented: $chegando) {
             ChegadaFormView(trip: trip)
+        }
+        .confirmationDialog("Reabrir a viagem?", isPresented: $reabrindo, titleVisibility: .visible) {
+            Button("Reabrir e remover a chegada", role: .destructive) {
+                trip.reabrir(em: context)
+            }
+            
+            Button("Cancelar", role: .cancel) { }
+        } message: {
+            Text("O ponto de chegada será removido. Despesas ligadas a ele ficam sem local.")
         }
     }
 }

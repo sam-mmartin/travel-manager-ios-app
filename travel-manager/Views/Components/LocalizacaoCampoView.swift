@@ -8,6 +8,8 @@ import SwiftUI
 
 struct LocalizacaoCampoView: View {
     @Binding var coordenada: Coordenada?
+    var capturarAoAparecer = false
+    var buscando: Binding<Bool> = .constant(false)
     @State private var localizacao = LocalizacaoGPS()
     
     private var coordenadaTexto: String? {
@@ -75,8 +77,15 @@ struct LocalizacaoCampoView: View {
             }
         }
         .onChange(of: localizacao.estado) { _, novo in
+            buscando.wrappedValue = (novo == .buscando)
+            
             if case .obtido(let c) = novo {
                 coordenada = c
+            }
+        }
+        .task {
+            if capturarAoAparecer && coordenada == nil {
+                localizacao.capturar()
             }
         }
     }

@@ -114,7 +114,7 @@ final class LocalizacaoGPS: NSObject, CLLocationManagerDelegate {
         }
     }
     
-    /// MARK: CLLocationManagerDelegate
+    // MARK: CLLocationManagerDelegate
     
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         let status = manager.authorizationStatus

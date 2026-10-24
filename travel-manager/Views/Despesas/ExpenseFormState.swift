@@ -38,13 +38,13 @@ final class ExpenseFormState {
         self.trip = trip
         self.categoria = categoriaInicial
         
-        let ultimo = trip.pontosOrdenados.last
-        self.modo = ultimo == nil ? .novo : .existente
+        let ultimo = trip.pontosDoPercurso.last
+        self.modo = .novo
         self.pontoID = ultimo?.persistentModelID
         self.novoOdometro = trip.odometroAtual
     }
     
-    /// MARK: Combustivel
+    // MARK: Combustivel
     
     var litrosCalculados: Double? {
         guard litros == nil,
@@ -87,14 +87,14 @@ final class ExpenseFormState {
         return "Preço do litro estimado: " + p.moedaCasas(2)
     }
     
-    /// MARK: Ponto
+    // MARK: Ponto
     
     var pontoSelecionado: Ponto? {
         guard let pontoID else {
             return nil
         }
         
-        return trip.pontosOrdenados.first {
+        return trip.pontosDoPercurso.first {
             $0.persistentModelID == pontoID
         }
     }
@@ -115,10 +115,16 @@ final class ExpenseFormState {
     }
     
     func rotulo(_ p: Ponto) -> String {
-        p.nome + " - " + p.odometro.kmTexto
+        var texto = p.nome
+        
+        if let tipo = p.tipo.rotulo {
+            texto += " (" + tipo + ")"
+        }
+        
+        return texto + " • " + p.odometro.kmTexto
     }
     
-    /// MARK: Validacao e Gravacao
+    // MARK: Validacao e Gravacao
     
     var podeSalvar: Bool {
         guard (valor ?? 0) > 0 else {

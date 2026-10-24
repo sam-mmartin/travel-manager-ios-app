@@ -27,7 +27,7 @@ extension Double {
     var kmPorLitroTexto: String {
         formatted(.number.precision(
             .fractionLength(1)
-        )) + "km/l"
+        )) + " km/l"
     }
     
     var litrosTexto: String {

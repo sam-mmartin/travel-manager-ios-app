@@ -15,35 +15,26 @@ struct PontosListView: View {
     var body: some View {
         List {
             Section {
-                PontoRowView(nome: trip.origemNome,
-                             horario: trip.inicio,
-                             odometro: trip.odometroInicial,
-                rotulo: "Partida")
-                
-                ForEach(trip.pontosOrdenados) { p in
+                ForEach(trip.pontosDoPercurso) { p in
                     PontoRowView(nome: p.nome,
                                  horario: p.horario,
                                  odometro: p.odometro,
+                                 rotulo: p.tipo.rotulo,
                                  temLocalizacao: p.temLocalizacao)
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        Button(role: .destructive) {
-                            context.delete(p)
-                        } label: {
-                            Label("Excluir", systemImage: "trash")
+                        if p.tipo == .intermediario {
+                            Button(role: .destructive) {
+                                context.delete(p)
+                            } label: {
+                                Label("Excluir", systemImage: "trash")
+                            }
                         }
                     }
-                }
-                
-                if trip.chegou, let fim = trip.fim, let odo = trip.odometroFinal {
-                    PontoRowView(nome: trip.destinoNome,
-                                 horario: fim,
-                                 odometro: odo,
-                    rotulo: "Chegada")
                 }
             } header: {
                 Text("Todos os pontos")
             } footer: {
-                Text("Partida e chegada fazem parte da viagem e não podem ser excluidas aqui.")
+                Text("Partida e chegada não podem ser excluidas aqui. Para desfazer a chegada, use Reabrir viagem.")
             }
         }
         .navigationTitle("Pontos")
