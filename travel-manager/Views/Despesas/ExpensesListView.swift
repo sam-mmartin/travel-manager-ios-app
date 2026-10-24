@@ -22,7 +22,7 @@ struct ExpensesListView: View {
     }
     
     private var totalTexto: String {
-        trip.totalGasto.formatted(.currency(code: "BRL"))
+        trip.totalGasto.moeda
     }
     
     var body: some View {

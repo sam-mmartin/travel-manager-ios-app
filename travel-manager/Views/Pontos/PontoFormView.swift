@@ -15,6 +15,7 @@ struct PontoFormView: View {
     @State private var nome = ""
     @State private var horario = Date()
     @State private var odometro: Double?
+    @State private var coordenada: Coordenada?
     
     init(trip: Trip) {
         self.trip = trip
@@ -23,31 +24,8 @@ struct PontoFormView: View {
         _odometro = State(initialValue: sugestao)
     }
     
-    // Ponto imediatamente antes e depois do horario escolhido
-    private var anterior: PontoPercurso?  {
-        trip.percurso.last { $0.horario <= horario }
-    }
-    
-    private var proximo: PontoPercurso? {
-        trip.percurso.first { $0.horario > horario }
-    }
-    
     private var mensagemErro: String? {
-        if horario < trip.inicio {
-            return "O horário é anterior à partida da viagem."
-        }
-        
-        guard let odo = odometro else { return nil }
-        
-        if let a = anterior, odo < a.odometro {
-            return "O odômetro é menor que o de " + a.nome + "."
-        }
-        
-        if let p = proximo, odo > p.odometro {
-            return "O odômetro é maior que o de " + p.nome + ", que vem depois."
-        }
-        
-        return nil
+        trip.erroDePonto(horario: horario, odometro: odometro)
     }
     
     private var podeSalvar: Bool {
@@ -59,15 +37,21 @@ struct PontoFormView: View {
     var body: some View {
         NavigationStack {
             Form {
-                TextField("Local (cidade, posto, pedágio...)", text: $nome)
-                DatePicker("Horário", selection: $horario)
-                TextField("Odômetro (km)", value: $odometro, format: .number)
-                    .keyboardType(.decimalPad)
+                Section("Ponto") {
+                    TextField("Local (cidade, posto, pedágio...)", text: $nome)
+                    DatePicker("Horário", selection: $horario)
+                    TextField("Odômetro (km)", value: $odometro, format: .number)
+                        .keyboardType(.decimalPad)
+                    
+                    if let erro = mensagemErro {
+                        Text(erro)
+                            .font(.footnote)
+                            .foregroundStyle(.red)
+                    }
+                }
                 
-                if let erro = mensagemErro {
-                    Text(erro)
-                        .font(.footnote)
-                        .foregroundStyle(.red)
+                Section("Localização (opcional)") {
+                    LocalizacaoCampoView(coordenada: $coordenada)
                 }
             }
             .navigationTitle("Novo ponto")
@@ -78,9 +62,11 @@ struct PontoFormView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Salvar") {
-                        let p = Ponto(nome: nome,
+                        let nomeLimpo = nome.trimmingCharacters(in: .whitespaces)
+                        let p = Ponto(nome: nomeLimpo,
                                       horario: horario,
-                                      odometro: odometro ?? 0)
+                                      odometro: odometro ?? 0,
+                                      coordenada: coordenada)
                         
                         context.insert(p)
                         p.trip = trip

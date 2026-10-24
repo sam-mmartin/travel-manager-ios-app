@@ -14,19 +14,11 @@ struct TrechoRowView: View {
         trecho.origem.nome + " -> " + trecho.destino.nome
     }
     
-    private var kmTexto: String {
-        trecho.km.formatted(
-            .number.precision(.fractionLength(0...1))
-        ) + " km"
-    }
-    
     private var detalhe: String {
         var texto = formatarDuracao(trecho.duracao)
         
         if let v = trecho.velocidadeMedia {
-            texto += " - " + v.formatted(
-                .number.precision(.fractionLength(0))
-            ) + " km/h"
+            texto += " - " + v.velocidadeTexto
         }
         
         return texto
@@ -41,7 +33,7 @@ struct TrechoRowView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Text(kmTexto)
+            Text(trecho.km.kmTexto)
         }
     }
 }

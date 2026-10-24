@@ -13,7 +13,7 @@ struct CategoriaTotalRowView: View {
     let total: Decimal
     
     private var totalTexto: String {
-        total.formatted(.currency(code: "BRL"))
+        total.moeda
     }
     
     var body: some View {

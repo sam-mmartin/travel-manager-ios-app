@@ -12,6 +12,7 @@ struct PontoRowView: View {
     let horario: Date
     let odometro: Double
     var rotulo: String? = nil
+    var temLocalizacao: Bool = false
     
     private var horarioTexto: String {
         let h = horario.formatted(date: .abbreviated, time: .shortened)
@@ -21,22 +22,24 @@ struct PontoRowView: View {
         return h
     }
     
-    private var odometroTexto: String {
-        odometro.formatted(
-            .number.precision(.fractionLength(0...1))
-        ) + " km"
-    }
-    
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text(nome)
+                HStack(spacing: 4) {
+                    Text(nome)
+                    
+                    if temLocalizacao {
+                        Image(systemName: "location.fill")
+                            .font(.caption)
+                            .foregroundStyle(.blue)
+                    }
+                }
                 Text(horarioTexto)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Text(odometroTexto)
+            Text(odometro.kmTexto)
                 .foregroundStyle(.secondary)
         }
     }

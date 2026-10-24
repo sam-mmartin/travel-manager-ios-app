@@ -16,17 +16,6 @@ struct PercursoView: View {
         trip.chegou ? "Concluída" : "Em andamento"
     }
     
-    private var percursoTempoTexto: String {
-        formatarDuracao(trip.percursoDuracao)
-    }
-    
-    
-    private var percursoKmTexto: String {
-        trip.percursoKm.formatted(
-            .number.precision(.fractionLength(0...1))
-        ) + " km"
-    }
-
     private var ultimoTrecho: Trecho? {
         trip.trechos.last
     }
@@ -44,14 +33,13 @@ struct PercursoView: View {
         return nil
     }
     
-    
     var body: some View {
         List {
             Section {
                 LabeledContent("Rota", value: trip.rotaTexto)
                 LabeledContent("Situação", value: statusTexto)
-                LabeledContent("Distância", value: percursoKmTexto)
-                LabeledContent("Tempo", value: percursoTempoTexto)
+                LabeledContent("Distância", value: trip.percursoKm.kmTexto)
+                LabeledContent("Tempo", value: formatarDuracao(trip.percursoDuracao))
             } header: {
                 Text("Percurso Total")
             } footer: {

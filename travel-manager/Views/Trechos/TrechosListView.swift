@@ -14,21 +14,11 @@ struct TrechosListView: View {
         trip.trechos
     }
     
-    private var totalKmTexto: String {
-        trip.percursoKm.formatted(
-            .number.precision(.fractionLength(0...1))
-        ) + " km"
-    }
-    
-    private var totalTempoTexto: String {
-        formatarDuracao(trip.percursoDuracao)
-    }
-    
     var body: some View {
         List {
             Section("Total do percurso") {
-                LabeledContent("Distância", value: totalKmTexto)
-                LabeledContent("Tempo", value: totalTempoTexto)
+                LabeledContent("Distância", value: trip.percursoKm.kmTexto)
+                LabeledContent("Tempo", value: formatarDuracao(trip.percursoDuracao))
             }
             
             Section("Todos os trechos") {

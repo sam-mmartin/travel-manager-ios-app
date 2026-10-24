@@ -23,7 +23,8 @@ struct PontosListView: View {
                 ForEach(trip.pontosOrdenados) { p in
                     PontoRowView(nome: p.nome,
                                  horario: p.horario,
-                                 odometro: p.odometro)
+                                 odometro: p.odometro,
+                                 temLocalizacao: p.temLocalizacao)
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) {
                             context.delete(p)

@@ -36,7 +36,7 @@ struct CategoriaDespesasView: View {
     }
     
     private var totalTexto: String {
-        trip.total(de: categoria).formatted(.currency(code: "BRL"))
+        trip.total(de: categoria).moeda
     }
     
     var body: some View {

@@ -11,49 +11,27 @@ import SwiftData
 struct KilometragemView: View {
     let trip: Trip
     
-    private var kmTexto: String {
-        let n = trip.kmPercorrido.formatted(
-            .number.precision(.fractionLength(0...1)))
-        
-        return n + " km"
-    }
-    
     private var consumoTexto: String {
-        guard let c = trip.consumoMedio else { return "-"}
-        let n = c.formatted(.number.precision(.fractionLength(1)))
-        
-        return n + " km/l"
+        trip.consumoMedio?.kmPorLitroTexto ?? "-"
     }
     
     private var custoKmTexto: String {
         guard let c = trip.custoPorKm else { return "-" }
-        return c.formatted(.currency(code: "BRL"))
-    }
-    
-    private var odometroAtualTexto: String {
-        trip.odometroAtual.formatted(
-            .number.precision(.fractionLength(0...1))
-        ) + " km"
-    }
-    
-    private var odometroInicialTexto: String {
-        trip.odometroInicial.formatted(
-            .number.precision(.fractionLength(0...1))
-        ) + " km"
+        return c.moeda + "/km"
     }
     
     var body: some View {
         List {
             Section("Resumo") {
-                LabeledContent("Distância percorrida", value: kmTexto)
+                LabeledContent("Distância percorrida", value: trip.kmPercorrido.kmTexto)
                 LabeledContent("Consumo médio", value: consumoTexto)
                 LabeledContent("Custo por km", value: custoKmTexto)
             }
             
             Section {
-                LabeledContent("Odômetro inicial", value: odometroInicialTexto)
+                LabeledContent("Odômetro inicial", value: trip.odometroInicial.kmTexto)
                 LabeledContent(trip.chegou ? "Odômetro final" : "Odômetro atual",
-                value: odometroAtualTexto)
+                               value: trip.odometroAtual.kmTexto)
             } header: {
                 Text("Odômetro")
             } footer: {

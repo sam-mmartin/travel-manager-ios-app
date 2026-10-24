@@ -23,7 +23,7 @@ struct TripDetailView: View {
     }
     
     private var totalGastoTexto: String {
-        trip.totalGasto.formatted(.currency(code: "BRL"))
+        trip.totalGasto.moeda
     }
     
     private var tempoParadoTexto: String {
@@ -106,7 +106,7 @@ struct TripDetailView: View {
                 } label: {
                     Label("Quilometragem", systemImage: "speedometer")
                 }
-            }            
+            }
         }
         .navigationTitle(trip.nome)
         .toolbar {

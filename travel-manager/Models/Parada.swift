@@ -27,10 +27,3 @@ final class Parada {
     }
     
 }
-
-func formatarDuracao(_ intervalo: TimeInterval) -> String {
-    if intervalo < 60 { return "menos de 1 min" }
-    
-    return Duration.seconds(intervalo)
-        .formatted(.units(allowed: [.hours, .minutes], width: .abbreviated))
-}

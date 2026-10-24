@@ -16,29 +16,25 @@ struct ExpenseRow: View {
     }
     
     private var valorTexto: String {
-        despesa.valor.formatted(.currency(code: "BRL"))
+        despesa.valor.moeda
     }
     
     private var localTexto: String? {
         guard let ponto = despesa.ponto else { return nil }
-        let km = ponto.odometro.formatted(
-            .number.precision(.fractionLength(0...1))
-        )
         
-        return ponto.nome + " - " + km + " km"
+        return ponto.nome + " - " + ponto.odometro.kmTexto
     }
     
     private var detalheCombustivel: String? {
         guard let litros = despesa.litrosEfetivos else { return nil }
-        var texto = litros.formatted(.number.precision(.fractionLength(1))) + " L"
+        var texto = litros.litrosTexto
         
         if let preco = despesa.precoLitroEfetivo {
-            let precoTexto = preco.formatted(.currency(code: "BRL").precision(.fractionLength(2)))
-            texto += " - " + precoTexto + "/L"
+            texto += " - " + preco.moedaCasas(2) + "/L"
         }
         
         if let consumo {
-            texto += " - " + consumo.formatted(.number.precision(.fractionLength(1))) + " km/L"
+            texto += " - " + consumo.kmPorLitroTexto
         }
         
         
