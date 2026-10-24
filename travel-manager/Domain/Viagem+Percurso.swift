@@ -1,12 +1,12 @@
 //
-//  Trip+Percurso.swift
+//  Viagem+Percurso.swift
 //  travel-manager
 //
 //  Created by Samuel on 23/10/26.
 //
 import Foundation
 
-extension Trip {
+extension Viagem {
     // MARK: Pontos fixos
     
     var pontoPartida: Ponto? {

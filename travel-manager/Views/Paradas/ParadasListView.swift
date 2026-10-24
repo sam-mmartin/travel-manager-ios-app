@@ -9,24 +9,18 @@ import SwiftUI
 import SwiftData
 
 struct ParadasListView: View {
-    let trip: Trip
+    let viagem: Viagem
     @Environment(\.modelContext) private var context
     @State private var paradaEditando: Parada?
     
     private var ordenadas: [Parada] {
-        trip.listaParadas.sorted {
-            $0.inicio > $1.inicio
-        }
-    }
-    
-    private var tempoParadoTexto: String {
-        formatarDuracao(trip.tempoParado)
+        viagem.paradasOrdenadas
     }
     
     var body: some View {
         List {
             Section {
-                LabeledContent("Tempo parado total", value: tempoParadoTexto)
+                TempoParadoView(viagem: viagem, titulo: "Tempo parado total")
             }
             
             Section("Todas as paradas") {

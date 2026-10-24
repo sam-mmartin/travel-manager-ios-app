@@ -12,11 +12,8 @@ import SwiftData
 struct travel_managerApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ViagensListView()
         }
-        .modelContainer(for: [Trip.self,
-                              Expense.self,
-                              Parada.self,
-                              Ponto.self])
+        .modelContainer(for: Esquema.modelos)
     }
 }

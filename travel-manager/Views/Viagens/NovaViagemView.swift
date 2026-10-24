@@ -1,5 +1,5 @@
 //
-//  NewTripView.swift
+//  NovaViagemView.swift
 //  travel-manager
 //
 //  Created by Samuel on 24/10/26.
@@ -7,7 +7,7 @@
 import SwiftUI
 import SwiftData
 
-struct NewTripView: View {
+struct NovaViagemView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     
@@ -20,11 +20,7 @@ struct NewTripView: View {
     @State private var buscandoGPS = false
     
     private var podeSalvar: Bool {
-        let nomeOk = !nome.trimmingCharacters(in: .whitespaces).isEmpty
-        let origemOk = !origem.trimmingCharacters(in: .whitespaces).isEmpty
-        let destinoOk = !destino.trimmingCharacters(in: .whitespaces).isEmpty
-        
-        return nomeOk && origemOk && destinoOk
+        !nome.limpo.isEmpty && !origem.limpo.isEmpty && !destino.limpo.isEmpty
     }
     
     var body: some View {
@@ -48,7 +44,8 @@ struct NewTripView: View {
                 Section("Localização da partida") {
                     LocalizacaoCampoView(coordenada: $coordenada,
                                          capturarAoAparecer: true,
-                                         buscando: $buscandoGPS)
+                                         buscando: $buscandoGPS,
+                                         nomeSugerido: $origem)
                 }
             }
             .navigationTitle("Nova viagem")
@@ -59,13 +56,13 @@ struct NewTripView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Salvar") {
-                        Trip.criar(nome: nome.trimmingCharacters(in: .whitespaces),
-                                   origem: origem.trimmingCharacters(in: .whitespaces),
-                                   destino: destino.trimmingCharacters(in: .whitespaces),
-                                   horario: inicio,
-                                   odometro: odometro ?? 0,
-                                   coordenada: coordenada,
-                                   em: context)
+                        Viagem.criar(nome: nome,
+                                     origem: origem,
+                                     destino: destino,
+                                     horario: inicio,
+                                     odometro: odometro ?? 0,
+                                     coordenada: coordenada,
+                                     em: context)
                         
                         dismiss()
                     }

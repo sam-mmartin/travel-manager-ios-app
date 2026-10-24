@@ -8,17 +8,17 @@ import SwiftUI
 import SwiftData
 
 struct TrechosListView: View {
-    let trip: Trip
+    let viagem: Viagem
     
     private var trechos: [Trecho] {
-        trip.trechos
+        viagem.trechos
     }
     
     var body: some View {
         List {
             Section("Total do percurso") {
-                LabeledContent("Distância", value: trip.percursoKm.kmTexto)
-                LabeledContent("Tempo", value: formatarDuracao(trip.percursoDuracao))
+                LabeledContent("Distância", value: viagem.percursoKm.kmTexto)
+                LabeledContent("Tempo", value: formatarDuracao(viagem.percursoDuracao))
             }
             
             Section("Todos os trechos") {

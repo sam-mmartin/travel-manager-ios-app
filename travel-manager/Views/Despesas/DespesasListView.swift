@@ -1,5 +1,5 @@
 //
-//  ExpensesListView.swift
+//  DespesasListView.swift
 //  travel-manager
 //
 //  Created by Samuel on 19/10/26.
@@ -8,21 +8,17 @@
 import SwiftUI
 import SwiftData
 
-struct ExpensesListView: View {
-    let trip: Trip
+struct DespesasListView: View {
+    let viagem: Viagem
     @Environment(\.modelContext) private var context
     @State private var novaDespesa = false
     
-    private var ordenadas: [Expense] {
-        trip.listaDespesas.sorted {
-            if $0.data != $1.data {return $0.data > $1.data}
-            
-            return $0.valor > $1.valor
-        }
+    private var ordenadas: [Despesa] {
+        viagem.despesasOrdenadas
     }
     
     private var totalTexto: String {
-        trip.totalGasto.moeda
+        viagem.totalGasto.moeda
     }
     
     var body: some View {
@@ -33,7 +29,7 @@ struct ExpensesListView: View {
             
             Section("Todas as despeas") {
                 ForEach(ordenadas) { d in
-                    ExpenseRowView(despesa: d, consumo: trip.consumo(de: d))
+                    ExpenseRowView(despesa: d, consumo: viagem.consumo(de: d))
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 context.delete(d)
@@ -60,7 +56,7 @@ struct ExpensesListView: View {
             }
         }
         .sheet(isPresented: $novaDespesa) {
-            ExpenseFormView(trip: trip)
+            DespesaFormView(viagem: viagem)
         }
     }
 }

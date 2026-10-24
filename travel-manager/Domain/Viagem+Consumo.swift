@@ -1,5 +1,5 @@
 //
-//  Trip+Consumo.swift
+//  Viagem+Consumo.swift
 //  travel-manager
 //
 //  Created by Samuel on 23/10/26.
@@ -7,7 +7,7 @@
 import Foundation
 import SwiftData
 
-extension Trip {
+extension Viagem {
     /// Consumo medido entre um abastecimento e o anterior
     struct TrechoConsumo {
         let id: PersistentIdentifier
@@ -16,8 +16,8 @@ extension Trip {
         var consumo: Double { km / litros }
     }
     
-    private var abastecimentosValidos: [Expense] {
-        var lista: [Expense] = []
+    private var abastecimentosValidos: [Despesa] {
+        var lista: [Despesa] = []
         
         for d in listaDespesas {
             if d.categoria == .combustivel, d.odometro != nil, d.litrosEfetivos != nil {
@@ -52,7 +52,7 @@ extension Trip {
         return trechos
     }
     
-    func consumo(de despesa: Expense) -> Double? {
+    func consumo(de despesa: Despesa) -> Double? {
         trechoConsumo.first {
             $0.id == despesa.persistentModelID
         }?.consumo

@@ -17,8 +17,8 @@ enum ModoPonto: String, CaseIterable, Identifiable {
 }
 
 @Observable
-final class ExpenseFormState {
-    let trip: Trip
+final class DespesaFormState {
+    let viagem: Viagem
     
     var categoria: Categoria
     var valor: Decimal?
@@ -29,19 +29,21 @@ final class ExpenseFormState {
     
     var modo: ModoPonto
     var pontoID: PersistentIdentifier?
+    var paradaID: PersistentIdentifier?
     var novoNome = ""
     var novoOdometro: Double?
     var novaCoordenada: Coordenada?
     
     
-    init(trip: Trip, categoriaInicial: Categoria = .combustivel) {
-        self.trip = trip
+    init(viagem: Viagem, categoriaInicial: Categoria = .combustivel) {
+        self.viagem = viagem
         self.categoria = categoriaInicial
         
-        let ultimo = trip.pontosDoPercurso.last
+        let ultimo = viagem.pontosDoPercurso.last
         self.modo = .novo
         self.pontoID = ultimo?.persistentModelID
-        self.novoOdometro = trip.odometroAtual
+        self.novoOdometro = viagem.odometroAtual
+        self.paradaID = viagem.paradaAberta?.persistentModelID
     }
     
     // MARK: Combustivel
@@ -94,24 +96,38 @@ final class ExpenseFormState {
             return nil
         }
         
-        return trip.pontosDoPercurso.first {
+        return viagem.pontosDoPercurso.first {
             $0.persistentModelID == pontoID
         }
     }
     
     var erroNovoPonto: String? {
-        guard modo == .novo else {
+        guard pontoDeParada == nil, modo == .novo else {
             return nil
         }
         
-        return trip.erroDePonto(horario: data,
-                                odometro: novoOdometro)
+        return viagem.erroDePonto(horario: data,
+                                  odometro: novoOdometro)
     }
     
     var novoPontoCompleto: Bool {
         let nomeOk = !novoNome.trimmingCharacters(in: .whitespaces).isEmpty
         
         return nomeOk && novoOdometro != nil
+    }
+    
+    var paradaSelecionada: Parada? {
+        guard let paradaID else {
+            return nil
+        }
+        
+        return viagem.listaParadas.first {
+            $0.persistentModelID == paradaID
+        }
+    }
+    
+    var pontoDeParada: Ponto? {
+        paradaSelecionada?.ponto
     }
     
     func rotulo(_ p: Ponto) -> String {
@@ -124,11 +140,27 @@ final class ExpenseFormState {
         return texto + " • " + p.odometro.kmTexto
     }
     
+    func rotulo(_ p: Parada) -> String {
+        var texto = p.titulo
+        texto += " • " + p.inicio.formatted(date: .abbreviated,
+                                            time: .shortened)
+        
+        if p.emAndamento {
+            texto += " (em andamento)"
+        }
+        
+        return texto
+    }
+    
     // MARK: Validacao e Gravacao
     
     var podeSalvar: Bool {
         guard (valor ?? 0) > 0 else {
             return false
+        }
+        
+        if pontoDeParada != nil {
+            return true
         }
         
         switch modo {
@@ -142,30 +174,33 @@ final class ExpenseFormState {
     }
     
     func salvar(em context: ModelContext) {
-        let despesa = Expense(categoria: categoria,
-                              valor: valor ?? 0,
-                              descricao: descricao,
-                              data: data,
-                              litros: categoria == .combustivel ? litros : nil,
-                              precoLitro: categoria == .combustivel ? precoLitro : nil)
+        var ponto: Ponto?
         
-        context.insert(despesa)
-        despesa.trip = trip
-        
-        switch modo {
-        case .existente:
-            despesa.ponto = pontoSelecionado
-        case .novo:
-            let nome = novoNome.trimmingCharacters(in: .whitespaces)
-            let ponto = Ponto(nome: nome,
-                              horario: data,
-                              odometro: novoOdometro ?? 0,
-                              coordenada: novaCoordenada)
-            context.insert(ponto)
-            ponto.trip = trip
-            despesa.ponto = ponto
-        case .nenhum:
-            break
+        if let daParada = pontoDeParada {
+            ponto = daParada
+        } else {
+            switch modo {
+            case .existente:
+                ponto = pontoSelecionado
+            case .novo:
+                ponto = viagem.adicionarPonto(nome: novoNome,
+                                              horario: data,
+                                              odometro: novoOdometro ?? 0,
+                                              coordenada: novaCoordenada,
+                                              em: context)
+            case .nenhum:
+                break
+            }
         }
+        
+        viagem.adicionarDespesa(categoria: categoria,
+                                valor: valor ?? 0,
+                                descricao: descricao,
+                                data: data,
+                                litros: categoria == .combustivel ? litros : nil,
+                                precoLitro: categoria == .combustivel ? precoLitro : nil,
+                                ponto: ponto,
+                                parada: paradaSelecionada,
+                                em: context)
     }
 }

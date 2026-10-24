@@ -11,11 +11,7 @@ struct PontoMapaCartaoView: View {
     let ponto: Ponto
     
     private var rotulo: String? {
-        switch ponto.tipo {
-        case .partida: return "Partida"
-        case .intermediario: return nil
-        case .chegada: return "Chegada"
-        }
+        ponto.tipo.rotulo
     }
     
     private var detalhe: String {

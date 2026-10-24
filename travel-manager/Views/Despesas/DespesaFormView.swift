@@ -1,5 +1,5 @@
 //
-//  ExpenseFormView.swift
+//  DespesaFormView.swift
 //  travel-manager
 //
 //  Created by Samuel on 22/10/26.
@@ -9,20 +9,50 @@ import SwiftData
 
 
 
-struct ExpenseFormView: View {
+struct DespesaFormView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
-    @State private var estado: ExpenseFormState
+    @State private var estado: DespesaFormState
     
-    init(trip: Trip, categoriaInicial: Categoria = .combustivel) {
-        _estado = State(initialValue: ExpenseFormState(
-            trip: trip,
+    init(viagem: Viagem, categoriaInicial: Categoria = .combustivel) {
+        _estado = State(initialValue: DespesaFormState(
+            viagem: viagem,
             categoriaInicial: categoriaInicial
         ))
     }
     
     @ViewBuilder
+    private var secaoParada: some View {
+        if estado.viagem.paradasOrdenadas.isEmpty {
+            Text("Nenhuma parada registrada. Inicie uma parada na tela de viagem.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        } else {
+            Picker("Parada", selection: $estado.paradaID) {
+                Text("Nenhuma").tag(PersistentIdentifier?.none)
+                
+                ForEach(estado.viagem.paradasOrdenadas) { p in
+                    Text(estado.rotulo(p))
+                        .tag(Optional(p.persistentModelID))
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
     private var secaoPonto: some View {
+        if let ponto = estado.pontoDeParada {
+            LabeledContent("Local da parada", value: estado.rotulo(ponto))
+            Text("A despesa usa o ponto da parada escolhida.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        } else {
+            seletorPonto
+        }
+    }
+    
+    @ViewBuilder
+    private var seletorPonto: some View {
         Picker("Ponto", selection: $estado.modo) {
             ForEach(ModoPonto.allCases) { Text($0.rawValue).tag($0) }
         }
@@ -30,12 +60,12 @@ struct ExpenseFormView: View {
         
         switch estado.modo {
         case .existente:
-            if estado.trip.pontosDoPercurso.isEmpty {
+            if estado.viagem.pontosDoPercurso.isEmpty {
                 Text("Nenhum ponto cadastrado. Use a opção Novo.")
                     .foregroundStyle(.secondary)
             } else {
                 Picker("Escolher ponto", selection: $estado.pontoID) {
-                    ForEach(estado.trip.pontosDoPercurso) { p in
+                    ForEach(estado.viagem.pontosDoPercurso) { p in
                         Text(estado.rotulo(p))
                             .tag(Optional(p.persistentModelID))
                     }
@@ -45,7 +75,9 @@ struct ExpenseFormView: View {
             TextField("Local (posto, cidade...", text: $estado.novoNome)
             TextField("Odômetro (km)", value: $estado.novoOdometro, format: .number)
                 .keyboardType(.decimalPad)
-            LocalizacaoCampoView(coordenada: $estado.novaCoordenada)
+            LocalizacaoCampoView(coordenada: $estado.novaCoordenada,
+                                 nomeSugerido: $estado.novoNome
+            )
             Text("O horário do ponto será a data da despesa.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
@@ -94,6 +126,10 @@ struct ExpenseFormView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
+                }
+                
+                Section("Parada") {
+                    secaoParada
                 }
                 
                 Section("Local") {

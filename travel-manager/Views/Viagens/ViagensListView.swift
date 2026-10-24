@@ -8,9 +8,9 @@
 import SwiftUI
 import SwiftData
 
-struct ContentView: View {
+struct ViagensListView: View {
     @Environment(\.modelContext) private var context
-    @Query(sort: \Trip.criadaEm, order: .reverse) private var viagens: [Trip]
+    @Query(sort: \Viagem.criadaEm, order: .reverse) private var viagens: [Viagem]
     @State private var criando = false
  
     var body: some View {
@@ -41,8 +41,8 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("Minhas Viagens")
-            .navigationDestination(for: Trip.self) {
-                TripDetailView(trip: $0)
+            .navigationDestination(for: Viagem.self) {
+                ViagemDetailView(viagem: $0)
             }
             .toolbar {
                 Button { criando = true} label: {
@@ -50,7 +50,7 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $criando) {
-                NewTripView()
+                NovaViagemView()
             }
         }
     }

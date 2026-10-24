@@ -1,5 +1,5 @@
 //
-//  TripDetailView.swift
+//  ViagemDetailView.swift
 //  travel-manager
 //
 //  Created by Samuel on 18/10/26.
@@ -8,32 +8,28 @@
 import SwiftUI
 import SwiftData
 
-struct TripDetailView: View {
-    @Bindable var trip: Trip
+struct ViagemDetailView: View {
+    @Bindable var viagem: Viagem
     @Environment(\.modelContext) private var context
     @State private var novaDespesa = false
     @State private var paradaEditando: Parada?
     
     private var ultimaParada: Parada?  {
-        trip.listaParadas.max { $0.inicio < $1.inicio }
+        viagem.listaParadas.max { $0.inicio < $1.inicio }
     }
     
     private var categoriasComGasto: [Categoria] {
-        Categoria.allCases.filter { trip.total(de: $0) > 0 }
+        Categoria.allCases.filter { viagem.total(de: $0) > 0 }
     }
     
     private var totalGastoTexto: String {
-        trip.totalGasto.moeda
-    }
-    
-    private var tempoParadoTexto: String {
-        formatarDuracao(trip.tempoParado)
+        viagem.totalGasto.moeda
     }
     
     private func iniciarParada() {
         let p = Parada()
         context.insert(p)
-        p.trip = trip
+        p.viagem = viagem
     }
     
     var body: some View {
@@ -43,35 +39,35 @@ struct TripDetailView: View {
                 
                 ForEach(categoriasComGasto) {cat in
                     NavigationLink {
-                        CategoriaDespesasView(trip: trip, categoria: cat)
+                        CategoriaDespesasView(viagem: viagem, categoria: cat)
                     } label: {
-                        CategoriaTotalRowView(categoria: cat, total: trip.total(de: cat))
+                        CategoriaTotalRowView(categoria: cat, total: viagem.total(de: cat))
                     }
                 }
                 
                 NavigationLink {
-                    ExpensesListView(trip: trip)
+                    DespesasListView(viagem: viagem)
                 } label: {
                     Label("Ver todas as despesas", systemImage: "list.bullet")
                 }
             }
             
             Section("Paradas") {
-                if let aberta = trip.paradaAberta {
+                if viagem.paradaAberta != nil {
                     Button {
-                        aberta.fim = .now
+                        viagem.encerrarParadaAberta()
                     } label: {
                         Label("Encerrar parada", systemImage: "stop.circle.fill")
                     }
                 } else {
                     Button {
-                        iniciarParada()
+                        viagem.iniciarParada(em: context)
                     } label: {
                         Label("Iniciar parada", systemImage: "play.circle.fill")
                     }
                 }
                 
-                if let ultima = ultimaParada {
+                if let ultima = viagem.ultimaParada {
                     ParadaRowView(parada: ultima)
                         .contentShape(Rectangle())
                         .onTapGesture {
@@ -82,10 +78,10 @@ struct TripDetailView: View {
                         .foregroundStyle(.secondary)
                 }
                 
-                LabeledContent("Tempo parado", value: tempoParadoTexto)
+                TempoParadoView(viagem: viagem)
                 
                 NavigationLink {
-                    ParadasListView(trip: trip)
+                    ParadasListView(viagem: viagem)
                 } label: {
                     Label("Ver todas as paradas", systemImage: "list.bullet")
                 }
@@ -93,7 +89,7 @@ struct TripDetailView: View {
             
             Section {
                 NavigationLink {
-                    PercursoView(trip: trip)
+                    PercursoView(viagem: viagem)
                 } label: {
                     Label("Percurso e trechos",
                           systemImage: "point.topleft.down.to.point.bottomright.curvepath")
@@ -102,19 +98,19 @@ struct TripDetailView: View {
 
             Section {
                 NavigationLink {
-                    KilometragemView(trip: trip)
+                    KilometragemView(viagem: viagem)
                 } label: {
                     Label("Quilometragem", systemImage: "speedometer")
                 }
             }
         }
-        .navigationTitle(trip.nome)
+        .navigationTitle(viagem.nome)
         .toolbar {
             Button { novaDespesa = true } label: {
                 Label("Nova despesa", systemImage: "plus")
             }
         }
-        .sheet(isPresented: $novaDespesa) { ExpenseFormView(trip: trip)}
+        .sheet(isPresented: $novaDespesa) { DespesaFormView(viagem: viagem)}
         .sheet(item: $paradaEditando) { p in
             ParadaEditView(parada: p)
         }
@@ -122,5 +118,5 @@ struct TripDetailView: View {
 }
 
 #Preview {
-    TripDetailView(trip: Trip(nome: "Brasilia", destino: "Lago Verde"))
+    ViagemDetailView(viagem: Viagem(nome: "Brasilia", destino: "Lago Verde"))
 }

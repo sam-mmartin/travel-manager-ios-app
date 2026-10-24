@@ -9,15 +9,16 @@ import Foundation
 import SwiftData
 
 @Model
-final class Expense {
+final class Despesa {
     var categoria: Categoria = Categoria.outros
     var valor: Decimal = 0
     var descricao: String = ""
     var data: Date = Date()
     var litros: Double?
     var precoLitro: Decimal?
-    var trip: Trip?
+    var viagem: Viagem?
     var ponto: Ponto?
+    var parada: Parada?
     
     var odometro: Double? { ponto?.odometro }
     

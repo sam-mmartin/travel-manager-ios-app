@@ -8,7 +8,7 @@ import SwiftUI
 import SwiftData
 
 struct ExpenseRowView: View {
-    let despesa: Expense
+    let despesa: Despesa
     let consumo: Double?
     
     private var titulo: String {
@@ -65,5 +65,5 @@ struct ExpenseRowView: View {
 }
 
 #Preview {
-    ExpenseRowView(despesa: Expense(categoria: .hotel, valor: 100), consumo: 0)
+    ExpenseRowView(despesa: Despesa(categoria: .hotel, valor: 100), consumo: 0)
 }

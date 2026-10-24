@@ -1,5 +1,5 @@
 //
-//  Trip.swift
+//  Viagem.swift
 //  travel-manager
 //
 //  Created by Samuel on 18/10/26.
@@ -8,18 +8,18 @@ import Foundation
 import SwiftData
 
 @Model
-final class Trip {
+final class Viagem {
     var nome: String = ""
     var destino: String = ""
     var criadaEm: Date = Date()
     
-    @Relationship(deleteRule: .cascade, inverse: \Expense.trip)
-    var despesas: [Expense]? = []
+    @Relationship(deleteRule: .cascade, inverse: \Despesa.viagem)
+    var despesas: [Despesa]? = []
     
-    @Relationship(deleteRule: .cascade, inverse: \Parada.trip)
+    @Relationship(deleteRule: .cascade, inverse: \Parada.viagem)
     var paradas: [Parada]? = []
     
-    @Relationship(deleteRule: .cascade, inverse: \Ponto.trip)
+    @Relationship(deleteRule: .cascade, inverse: \Ponto.viagem)
     var pontos: [Ponto]? = []
     
     init(nome: String, destino: String = "") {

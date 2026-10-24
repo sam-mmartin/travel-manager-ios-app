@@ -14,7 +14,11 @@ final class Parada {
     var fim: Date?
     var local: String = ""
     var motivo: String = ""
-    var trip: Trip?
+    var viagem: Viagem?
+    var ponto: Ponto?
+    
+    @Relationship(deleteRule: .nullify, inverse: \Despesa.parada)
+    var despesas: [Despesa]? = []
     
     init(inicio: Date = .now, local: String = "", motivo: String = "") {
         self.inicio = inicio
@@ -23,7 +27,7 @@ final class Parada {
     }
     
     var duracao: TimeInterval {
-        (fim ?? Date()).timeIntervalSince(inicio)
+        max(0, (fim ?? Date()).timeIntervalSince(inicio))
     }
     
 }

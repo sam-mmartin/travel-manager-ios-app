@@ -15,10 +15,13 @@ final class Ponto {
     var latitude: Double?
     var longitude: Double?
     var tipo: TipoPonto = TipoPonto.intermediario
-    var trip: Trip?
+    var viagem: Viagem?
     
-    @Relationship(deleteRule: .nullify, inverse: \Expense.ponto)
-    var despesas: [Expense]? = []
+    @Relationship(deleteRule: .nullify, inverse: \Despesa.ponto)
+    var despesas: [Despesa]? = []
+    
+    @Relationship(deleteRule: .nullify, inverse: \Parada.ponto)
+    var paradas: [Parada]? = []
     
     init(nome: String, horario: Date = .now, odometro: Double,
          coordenada: Coordenada? = nil,

@@ -9,33 +9,33 @@ import SwiftUI
 import SwiftData
 
 struct KilometragemView: View {
-    let trip: Trip
+    let viagem: Viagem
     
     private var consumoTexto: String {
-        trip.consumoMedio?.kmPorLitroTexto ?? "-"
+        viagem.consumoMedio?.kmPorLitroTexto ?? "-"
     }
     
     private var custoKmTexto: String {
-        guard let c = trip.custoPorKm else { return "-" }
+        guard let c = viagem.custoPorKm else { return "-" }
         return c.moeda + "/km"
     }
     
     var body: some View {
         List {
             Section("Resumo") {
-                LabeledContent("Distância percorrida", value: trip.kmPercorrido.kmTexto)
+                LabeledContent("Distância percorrida", value: viagem.kmPercorrido.kmTexto)
                 LabeledContent("Consumo médio", value: consumoTexto)
                 LabeledContent("Custo por km", value: custoKmTexto)
             }
             
             Section {
-                LabeledContent("Odômetro inicial", value: trip.odometroInicial.kmTexto)
-                LabeledContent(trip.chegou ? "Odômetro final" : "Odômetro atual",
-                               value: trip.odometroAtual.kmTexto)
+                LabeledContent("Odômetro inicial", value: viagem.odometroInicial.kmTexto)
+                LabeledContent(viagem.chegou ? "Odômetro final" : "Odômetro atual",
+                               value: viagem.odometroAtual.kmTexto)
             } header: {
                 Text("Odômetro")
             } footer: {
-                if !trip.chegou {
+                if !viagem.chegou {
                     Text("O odômetro atual é o maior valor registrado nos pontos. O final é informado ao registrar a chegada.")
             }
             }
@@ -46,5 +46,5 @@ struct KilometragemView: View {
 }
 
 #Preview {
-    KilometragemView(trip: Trip(nome: "Brasilia", destino: "Lago Verde"))
+    KilometragemView(viagem: Viagem(nome: "Brasilia", destino: "Lago Verde"))
 }

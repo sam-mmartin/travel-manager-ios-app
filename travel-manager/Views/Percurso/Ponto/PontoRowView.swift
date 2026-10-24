@@ -8,16 +8,13 @@ import SwiftUI
 import SwiftData
 
 struct PontoRowView: View {
-    let nome: String
-    let horario: Date
-    let odometro: Double
-    var rotulo: String? = nil
-    var temLocalizacao: Bool = false
+    let ponto: Ponto
     
     private var horarioTexto: String {
-        let h = horario.formatted(date: .abbreviated, time: .shortened)
+        let h = ponto.horario.formatted(date: .abbreviated,
+                                        time: .shortened)
         
-        if let rotulo { return rotulo + " - " + h }
+        if let rotulo = ponto.tipo.rotulo { return rotulo + " - " + h }
         
         return h
     }
@@ -26,9 +23,9 @@ struct PontoRowView: View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 4) {
-                    Text(nome)
+                    Text(ponto.nome)
                     
-                    if temLocalizacao {
+                    if ponto.temLocalizacao {
                         Image(systemName: "location.fill")
                             .font(.caption)
                             .foregroundStyle(.blue)
@@ -37,9 +34,15 @@ struct PontoRowView: View {
                 Text(horarioTexto)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                
+                if ponto.tempoParada >= 60 {
+                    Text("Parado " + formatarDuracao(ponto.tempoParada))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
             Spacer()
-            Text(odometro.kmTexto)
+            Text(ponto.odometro.kmTexto)
                 .foregroundStyle(.secondary)
         }
     }

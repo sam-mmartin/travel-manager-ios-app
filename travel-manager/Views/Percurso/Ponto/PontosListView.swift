@@ -8,19 +8,19 @@ import SwiftUI
 import SwiftData
 
 struct PontosListView: View {
-    let trip: Trip
+    let viagem: Viagem
     @Environment(\.modelContext) private var context
     @State private var novoPonto = false
     
     var body: some View {
         List {
             Section {
-                ForEach(trip.pontosDoPercurso) { p in
-                    PontoRowView(nome: p.nome,
-                                 horario: p.horario,
-                                 odometro: p.odometro,
-                                 rotulo: p.tipo.rotulo,
-                                 temLocalizacao: p.temLocalizacao)
+                ForEach(viagem.pontosDoPercurso) { p in
+                    NavigationLink {
+                        PontoDetailView(ponto: p)
+                    } label: {
+                        PontoRowView(ponto: p)
+                    }
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         if p.tipo == .intermediario {
                             Button(role: .destructive) {
@@ -45,7 +45,7 @@ struct PontosListView: View {
             }
         }
         .sheet(isPresented: $novoPonto) {
-            PontoFormView(trip: trip)
+            PontoFormView(viagem: viagem)
         }
     }
 }

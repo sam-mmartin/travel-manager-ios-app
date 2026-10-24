@@ -9,34 +9,18 @@ import SwiftUI
 import SwiftData
 
 struct CategoriaDespesasView: View {
-    let trip: Trip
+    let viagem: Viagem
     let categoria: Categoria
     
     @Environment(\.modelContext) private var context
     @State private var novaDespesa = false
     
-    private var despesas: [Expense] {
-        var lista: [Expense] = []
-        
-        for d in trip.listaDespesas {
-            if d.categoria == categoria {
-                lista.append(d)
-            }
-        }
-        
-        lista.sort {
-            if $0.data != $1.data {
-                return $0.data > $1.data
-            }
-            
-            return $0.valor > $1.valor
-        }
-        
-        return lista
+    private var despesas: [Despesa] {
+        viagem.despesasOrdenadas(de: categoria)
     }
     
     private var totalTexto: String {
-        trip.total(de: categoria).moeda
+        viagem.total(de: categoria).moeda
     }
     
     var body: some View {
@@ -51,7 +35,7 @@ struct CategoriaDespesasView: View {
             
             Section("Despesas") {
                 ForEach(despesas) { d in
-                    ExpenseRowView(despesa: d, consumo: trip.consumo(de: d))
+                    ExpenseRowView(despesa: d, consumo: viagem.consumo(de: d))
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 context.delete(d)
@@ -79,7 +63,7 @@ struct CategoriaDespesasView: View {
             }
         }
         .sheet(isPresented: $novaDespesa) {
-            ExpenseFormView(trip: trip, categoriaInicial: categoria)
+            DespesaFormView(viagem: viagem, categoriaInicial: categoria)
             
         }
     }

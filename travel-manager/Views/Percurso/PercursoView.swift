@@ -8,35 +8,35 @@ import SwiftUI
 import SwiftData
 
 struct PercursoView: View {
-    let trip: Trip
+    let viagem: Viagem
     @Environment(\.modelContext) private var context
     @State private var novoPonto = false
     @State private var chegando = false
     @State private var reabrindo = false
     
     private var statusTexto: String {
-        trip.chegou ? "Concluída" : "Em andamento"
+        viagem.chegou ? "Concluída" : "Em andamento"
     }
     
     private var ultimoTrecho: Trecho? {
-        trip.trechos.last
+        viagem.trechos.last
     }
     
     private var ultimoPonto: Ponto? {
-        trip.pontosDoPercurso.last
+        viagem.pontosDoPercurso.last
     }
     
     var body: some View {
         List {
             Section {
-                LabeledContent("Rota", value: trip.rotaTexto)
+                LabeledContent("Rota", value: viagem.rotaTexto)
                 LabeledContent("Situação", value: statusTexto)
-                LabeledContent("Distância", value: trip.percursoKm.kmTexto)
-                LabeledContent("Tempo", value: formatarDuracao(trip.percursoDuracao))
+                LabeledContent("Distância", value: viagem.percursoKm.kmTexto)
+                LabeledContent("Tempo", value: formatarDuracao(viagem.percursoDuracao))
             } header: {
                 Text("Percurso Total")
             } footer: {
-                if !trip.chegou {
+                if !viagem.chegou {
                     Text("Distância e tempo contados até o ultimo ponto registrado.")
                 }
             }
@@ -50,7 +50,7 @@ struct PercursoView: View {
                 }
                 
                 NavigationLink {
-                    TrechosListView(trip: trip)
+                    TrechosListView(viagem: viagem)
                 } label: {
                     Label("Ver todos os trechos", systemImage: "list.bullet")
                 }
@@ -58,22 +58,18 @@ struct PercursoView: View {
             
             Section("Ultimo Ponto") {
                 if let ponto = ultimoPonto {
-                    PontoRowView(nome: ponto.nome,
-                                 horario: ponto.horario,
-                                 odometro: ponto.odometro,
-                                 rotulo: ponto.tipo.rotulo,
-                                 temLocalizacao: ponto.temLocalizacao)
+                    PontoRowView(ponto: ponto)
                     
                 }
                 
                 NavigationLink {
-                    PontosListView(trip: trip)
+                    PontosListView(viagem: viagem)
                 } label: {
                     Label("Ver todos os pontos", systemImage: "list.bullet")
                 }
                 
                 NavigationLink {
-                    MapaPontosView(trip: trip)
+                    MapaPontosView(viagem: viagem)
                 } label: {
                     Label("Ver pontos no mapa",
                           systemImage: "map")
@@ -81,7 +77,7 @@ struct PercursoView: View {
             }
             
             Section {
-                if trip.chegou {
+                if viagem.chegou {
                     Button {
                         reabrindo = true
                     } label: {
@@ -92,7 +88,7 @@ struct PercursoView: View {
                     Button {
                         chegando = true
                     } label: {
-                        Label("Registrar chegada em " + trip.destinoNome,
+                        Label("Registrar chegada em " + viagem.destinoNome,
                               systemImage: "flag.checkered")
                     }
                 }
@@ -108,14 +104,14 @@ struct PercursoView: View {
             }
         }
         .sheet(isPresented: $novoPonto) {
-            PontoFormView(trip: trip)
+            PontoFormView(viagem: viagem)
         }
         .sheet(isPresented: $chegando) {
-            ChegadaFormView(trip: trip)
+            PontoFormView(viagem: viagem, registro: .chegada)
         }
         .confirmationDialog("Reabrir a viagem?", isPresented: $reabrindo, titleVisibility: .visible) {
             Button("Reabrir e remover a chegada", role: .destructive) {
-                trip.reabrir(em: context)
+                viagem.reabrir(em: context)
             }
             
             Button("Cancelar", role: .cancel) { }

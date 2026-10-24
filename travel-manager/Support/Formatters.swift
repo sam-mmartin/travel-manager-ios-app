@@ -54,3 +54,9 @@ func formatarDuracao(_ intervalo: TimeInterval) -> String {
             width: .abbreviated)
         )
 }
+
+extension String {
+    var limpo: String {
+        trimmingCharacters(in: .whitespaces)
+    }
+}

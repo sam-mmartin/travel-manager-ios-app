@@ -32,14 +32,14 @@ struct MarcadorPonto: Identifiable {
 }
 
 struct MapaPontosView: View {
-    let trip: Trip
+    let viagem: Viagem
     
     @State private var posicao: MapCameraPosition = .automatic
     @State private var selecao: PersistentIdentifier?
     @State private var mostrarRota = true
     
     private var pontos: [Ponto] {
-        trip.pontosComLocalizacao
+        viagem.pontosComLocalizacao
     }
     
     private var marcadores: [MarcadorPonto] {
