@@ -14,7 +14,7 @@ extension Viagem {
                       horario: Date, odometro: Double,
                       coordenada: Coordenada? = nil,
                       em context: ModelContext) -> Viagem {
-        let viagem = Viagem(nome: nome, destino: destino)
+        let viagem = Viagem(nome: nome.limpo, destino: destino.limpo)
         
         context.insert(viagem)
         

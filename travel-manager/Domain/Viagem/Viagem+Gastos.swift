@@ -49,22 +49,29 @@ extension Viagem {
         return soma
     }
     
+    private func pontoFinal(ponto: Ponto?, parada: Parada?) -> Ponto? {
+        guard let parada else {
+            return ponto
+        }
+        
+        if let doPonto = parada.ponto {
+            return doPonto
+        }
+        
+        if let ponto {
+            parada.definirPonto(ponto)
+        }
+        
+        return ponto
+    }
+    
     @discardableResult
     func adicionarDespesa(categoria: Categoria, valor: Decimal,
                           descricao: String = "", data: Date = .now,
                           litros: Double? = nil, precoLitro: Decimal? = nil,
                           ponto: Ponto? = nil, parada: Parada? = nil,
                           em context: ModelContext) -> Despesa {
-        var pontoFinal = ponto
-        
-        if let parada {
-            if let pontoDaParada = parada.ponto {
-                pontoFinal = pontoDaParada
-            } else if let ponto {
-                parada.definirPonto(ponto)
-            }
-        }
-        
+    
         let despesa = Despesa(categoria: categoria,
                               valor: valor,
                               descricao: descricao.limpo,
@@ -74,9 +81,24 @@ extension Viagem {
         
         context.insert(despesa)
         despesa.viagem = self
-        despesa.ponto = pontoFinal
+        despesa.ponto = pontoFinal(ponto: ponto, parada: parada)
         despesa.parada = parada
         
         return despesa
+    }
+    
+    func atualizarDespesa(_ despesa: Despesa, categoria: Categoria,
+                          valor: Decimal, descricao: String,
+                          data: Date, litros: Double?,
+                          precoLitro: Decimal?, ponto: Ponto?,
+                          parada: Parada?) {
+        despesa.categoria = categoria
+        despesa.valor = valor
+        despesa.descricao = descricao.limpo
+        despesa.data = data
+        despesa.litros = litros
+        despesa.precoLitro = precoLitro
+        despesa.ponto = pontoFinal(ponto: ponto, parada: parada)
+        despesa.parada = parada
     }
 }

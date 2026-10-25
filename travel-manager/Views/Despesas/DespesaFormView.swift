@@ -21,6 +21,13 @@ struct DespesaFormView: View {
         ))
     }
     
+    init(viagem: Viagem, editando despesa: Despesa) {
+        _estado = State(initialValue: DespesaFormState(
+            viagem: viagem,
+            editando: despesa
+        ))
+    }
+    
     @ViewBuilder
     private var secaoParada: some View {
         if estado.viagem.paradasOrdenadas.isEmpty {
@@ -137,7 +144,7 @@ struct DespesaFormView: View {
                 }
                 
             }
-            .navigationTitle("Nova despesa")
+            .navigationTitle(estado.editando == nil ? "Nova despesa" : "Editar despesa")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

@@ -1,5 +1,5 @@
 //
-//  ExpenseRowView.swift
+//  DespesaRowView.swift
 //  travel-manager
 //
 //  Created by Samuel on 22/10/26.
@@ -7,7 +7,7 @@
 import SwiftUI
 import SwiftData
 
-struct ExpenseRowView: View {
+struct DespesaRowView: View {
     let despesa: Despesa
     let consumo: Double?
     
@@ -65,5 +65,5 @@ struct ExpenseRowView: View {
 }
 
 #Preview {
-    ExpenseRowView(despesa: Despesa(categoria: .hotel, valor: 100), consumo: 0)
+    DespesaRowView(despesa: Despesa(categoria: .hotel, valor: 100), consumo: 0)
 }

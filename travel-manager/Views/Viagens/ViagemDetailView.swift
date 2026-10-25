@@ -9,14 +9,11 @@ import SwiftUI
 import SwiftData
 
 struct ViagemDetailView: View {
-    @Bindable var viagem: Viagem
+    let viagem: Viagem
     @Environment(\.modelContext) private var context
-    @State private var novaDespesa = false
+    @State private var novoPonto = false
     @State private var paradaEditando: Parada?
-    
-    private var ultimaParada: Parada?  {
-        viagem.listaParadas.max { $0.inicio < $1.inicio }
-    }
+    @State private var editandoViagem = false
     
     private var categoriasComGasto: [Categoria] {
         Categoria.allCases.filter { viagem.total(de: $0) > 0 }
@@ -26,32 +23,8 @@ struct ViagemDetailView: View {
         viagem.totalGasto.moeda
     }
     
-    private func iniciarParada() {
-        let p = Parada()
-        context.insert(p)
-        p.viagem = viagem
-    }
-    
     var body: some View {
         List {
-            Section("Resumo") {
-                LabeledContent("Total gasto", value: totalGastoTexto)
-                
-                ForEach(categoriasComGasto) {cat in
-                    NavigationLink {
-                        CategoriaDespesasView(viagem: viagem, categoria: cat)
-                    } label: {
-                        CategoriaTotalRowView(categoria: cat, total: viagem.total(de: cat))
-                    }
-                }
-                
-                NavigationLink {
-                    DespesasListView(viagem: viagem)
-                } label: {
-                    Label("Ver todas as despesas", systemImage: "list.bullet")
-                }
-            }
-            
             Section("Paradas") {
                 if viagem.paradaAberta != nil {
                     Button {
@@ -87,6 +60,24 @@ struct ViagemDetailView: View {
                 }
             }
             
+            Section("Resumo") {
+                LabeledContent("Total gasto", value: totalGastoTexto)
+                
+                ForEach(categoriasComGasto) {cat in
+                    NavigationLink {
+                        CategoriaDespesasView(viagem: viagem, categoria: cat)
+                    } label: {
+                        CategoriaTotalRowView(categoria: cat, total: viagem.total(de: cat))
+                    }
+                }
+                
+                NavigationLink {
+                    DespesasListView(viagem: viagem)
+                } label: {
+                    Label("Ver todas as despesas", systemImage: "list.bullet")
+                }
+            }
+            
             Section {
                 NavigationLink {
                     PercursoView(viagem: viagem)
@@ -105,12 +96,22 @@ struct ViagemDetailView: View {
             }
         }
         .navigationTitle(viagem.nome)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            Button { novaDespesa = true } label: {
-                Label("Nova despesa", systemImage: "plus")
+            ToolbarItemGroup {
+                Button("Editar") { editandoViagem = true }
+                
+                Button {
+                    novoPonto = true
+                } label: {
+                    Label("Novo Ponto", systemImage: "plus")
+                }
             }
         }
-        .sheet(isPresented: $novaDespesa) { DespesaFormView(viagem: viagem)}
+        .sheet(isPresented: $editandoViagem) {
+            ViagemEditView(viagem: viagem)
+        }
+        .sheet(isPresented: $novoPonto) { PontoFormView(viagem: viagem)}
         .sheet(item: $paradaEditando) { p in
             ParadaEditView(parada: p)
         }

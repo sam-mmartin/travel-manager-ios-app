@@ -18,7 +18,12 @@ struct TrechosListView: View {
         List {
             Section("Total do percurso") {
                 LabeledContent("Distância", value: viagem.percursoKm.kmTexto)
-                LabeledContent("Tempo", value: formatarDuracao(viagem.percursoDuracao))
+                LinhaTempoView(viagem: viagem,
+                               titulo: "Tempo total",
+                               valor: \.percursoDuracao)
+                LinhaTempoView(viagem: viagem,
+                               titulo: "Em movimento",
+                               valor: \.tempoEmMovimento)
             }
             
             Section("Todos os trechos") {

@@ -8,7 +8,7 @@ import SwiftUI
 
 struct TempoParadoView: View {
     let viagem: Viagem
-    var titulo = "Tempo parada"
+    var titulo = "Tempo parado"
     
     var body: some View {
         if viagem.paradaAberta != nil {

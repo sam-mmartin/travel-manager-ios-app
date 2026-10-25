@@ -64,6 +64,17 @@ struct ParadaRowView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
+            
+            if parada.emAndamento {
+                TimelineView(.periodic(from: .now, by: 60)) { _ in
+                    if parada.paradaLonga {
+                        Label("Em andamento há muito tempo. Encerre ou ajuste o horário.",
+                        systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                    }
+                }
+            }
         }
     }
 }

@@ -14,6 +14,8 @@ struct CategoriaDespesasView: View {
     
     @Environment(\.modelContext) private var context
     @State private var novaDespesa = false
+    @State private var despesaEditando: Despesa?
+    @State private var despesaParaExcluir: Despesa?
     
     private var despesas: [Despesa] {
         viagem.despesasOrdenadas(de: categoria)
@@ -35,22 +37,21 @@ struct CategoriaDespesasView: View {
             
             Section("Despesas") {
                 ForEach(despesas) { d in
-                    ExpenseRowView(despesa: d, consumo: viagem.consumo(de: d))
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                context.delete(d)
-                            } label: {
-                                Label("Excluir", systemImage: "trash")
-                            }
+                    DespesaRowView(despesa: d, consumo: viagem.consumo(de: d))
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            despesaEditando = d
                         }
-                }
+                        .swipeExcluir(confirmar: d.participaDoConsumo,
+                                      pedir: { despesaParaExcluir = d },
+                                      excluir: { context.delete(d) })                }
             }
         }
         .overlay {
             if despesas.isEmpty {
                 ContentUnavailableView("Nenhuma despesa",
                                        systemImage: categoria.icone,
-                description: Text("Não há despesas nesta categoria."))
+                                       description: Text("Não há despesas nesta categoria."))
             }
         }
         .navigationTitle(categoria.rawValue)
@@ -65,6 +66,14 @@ struct CategoriaDespesasView: View {
         .sheet(isPresented: $novaDespesa) {
             DespesaFormView(viagem: viagem, categoriaInicial: categoria)
             
+        }
+        .sheet(item: $despesaEditando) { d in
+            DespesaFormView(viagem: viagem, editando: d)
+        }
+        .confirmarExclusao(de: $despesaParaExcluir,
+                           titulo: "Excluir este abastecimento?",
+                           botao: "Excluir abastecimento") { _ in
+            "Este abastecimento entra no cálculo de consumo. O consumo médio será recalculado sem ele."
         }
     }
 }

@@ -32,7 +32,15 @@ struct PercursoView: View {
                 LabeledContent("Rota", value: viagem.rotaTexto)
                 LabeledContent("Situação", value: statusTexto)
                 LabeledContent("Distância", value: viagem.percursoKm.kmTexto)
-                LabeledContent("Tempo", value: formatarDuracao(viagem.percursoDuracao))
+                LinhaTempoView(viagem: viagem,
+                               titulo: "Tempo total",
+                               valor: \.percursoDuracao)
+                LinhaTempoView(viagem: viagem,
+                               titulo: "Tempo parado",
+                               valor: \.tempoParadoNoPercurso)
+                LinhaTempoView(viagem: viagem,
+                               titulo: "Em movimento",
+                               valor: \.tempoEmMovimento)
             } header: {
                 Text("Percurso Total")
             } footer: {

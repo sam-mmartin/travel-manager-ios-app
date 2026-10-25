@@ -19,6 +19,7 @@ enum ModoPonto: String, CaseIterable, Identifiable {
 @Observable
 final class DespesaFormState {
     let viagem: Viagem
+    let editando: Despesa?
     
     var categoria: Categoria
     var valor: Decimal?
@@ -37,6 +38,7 @@ final class DespesaFormState {
     
     init(viagem: Viagem, categoriaInicial: Categoria = .combustivel) {
         self.viagem = viagem
+        self.editando = nil
         self.categoria = categoriaInicial
         
         let ultimo = viagem.pontosDoPercurso.last
@@ -44,6 +46,27 @@ final class DespesaFormState {
         self.pontoID = ultimo?.persistentModelID
         self.novoOdometro = viagem.odometroAtual
         self.paradaID = viagem.paradaAberta?.persistentModelID
+    }
+    
+    init(viagem: Viagem, editando despesa: Despesa) {
+        self.viagem = viagem
+        self.editando = despesa
+        self.categoria = despesa.categoria
+        self.valor = despesa.valor
+        self.descricao = despesa.descricao
+        self.data = despesa.data
+        self.litros = despesa.litros
+        self.precoLitro = despesa.precoLitro
+        self.paradaID = despesa.parada?.persistentModelID
+        self.novoOdometro = viagem.odometroAtual
+        
+        if let ponto = despesa.ponto {
+            self.modo = .existente
+            self.pontoID = ponto.persistentModelID
+        } else {
+            self.modo = .nenhum
+            self.pontoID = nil
+        }
     }
     
     // MARK: Combustivel
@@ -193,14 +216,30 @@ final class DespesaFormState {
             }
         }
         
-        viagem.adicionarDespesa(categoria: categoria,
-                                valor: valor ?? 0,
-                                descricao: descricao,
-                                data: data,
-                                litros: categoria == .combustivel ? litros : nil,
-                                precoLitro: categoria == .combustivel ? precoLitro : nil,
-                                ponto: ponto,
-                                parada: paradaSelecionada,
-                                em: context)
+        let litrosFinal = categoria == .combustivel ? litros : nil
+        let precoFinal = categoria == .combustivel ? precoLitro : nil
+        
+        if let editando {
+            viagem.atualizarDespesa(editando,
+                                    categoria: categoria,
+                                    valor: valor ?? 0,
+                                    descricao: descricao,
+                                    data: data,
+                                    litros: litrosFinal,
+                                    precoLitro: precoFinal,
+                                    ponto: ponto,
+                                    parada: paradaSelecionada)
+        } else {
+            viagem.adicionarDespesa(categoria: categoria,
+                                    valor: valor ?? 0,
+                                    descricao: descricao,
+                                    data: data,
+                                    litros: litrosFinal,
+                                    precoLitro: precoFinal,
+                                    ponto: ponto,
+                                    parada: paradaSelecionada,
+                                    em: context)
+        }
+        
     }
 }

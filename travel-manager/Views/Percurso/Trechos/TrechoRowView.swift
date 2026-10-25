@@ -15,13 +15,19 @@ struct TrechoRowView: View {
     }
     
     private var detalhe: String {
-        var texto = formatarDuracao(trecho.duracao)
+        var partes: [String] = []
         
-        if let v = trecho.velocidadeMedia {
-            texto += " - " + v.velocidadeTexto
+        partes.append(formatarDuracao(trecho.duracao) + " em movimento")
+        
+        if trecho.tempoParado >= 60 {
+            partes.append("parado " + formatarDuracao(trecho.tempoParado))
         }
         
-        return texto
+        if let v = trecho.velocidadeMedia {
+            partes.append(v.velocidadeTexto)
+        }
+        
+        return partes.joined(separator: " • ")
     }
     
     var body: some View {

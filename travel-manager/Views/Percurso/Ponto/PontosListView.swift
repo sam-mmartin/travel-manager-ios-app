@@ -11,6 +11,14 @@ struct PontosListView: View {
     let viagem: Viagem
     @Environment(\.modelContext) private var context
     @State private var novoPonto = false
+    @State private var pontoParaExcluir: Ponto?
+    
+    private var confirmando: Binding<Bool> {
+        Binding(
+            get: { pontoParaExcluir != nil },
+            set: { if !$0 { pontoParaExcluir = nil } }
+        )
+    }
     
     var body: some View {
         List {
@@ -21,15 +29,10 @@ struct PontosListView: View {
                     } label: {
                         PontoRowView(ponto: p)
                     }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        if p.tipo == .intermediario {
-                            Button(role: .destructive) {
-                                context.delete(p)
-                            } label: {
-                                Label("Excluir", systemImage: "trash")
-                            }
-                        }
-                    }
+                    .swipeExcluir(permitido: p.tipo == .intermediario,
+                                  confirmar: p.temVinculos,
+                                  pedir: { pontoParaExcluir = p },
+                                  excluir: { context.delete(p) })
                 }
             } header: {
                 Text("Todos os pontos")
@@ -46,6 +49,17 @@ struct PontosListView: View {
         }
         .sheet(isPresented: $novoPonto) {
             PontoFormView(viagem: viagem)
+        }
+        .confirmationDialog("Excluir este ponto?",
+                            isPresented: confirmando,
+                            titleVisibility: .visible,
+                            presenting: pontoParaExcluir) { ponto in
+            Button("Excluir ponto", role: .destructive) {
+                context.delete(ponto)
+            }
+            Button("Cancelar", role: .cancel) { }
+        } message: { ponto in
+            Text("Este ponto tem " + ponto.resumoVinculos + ". Eles continuam no app, mas ficam sem este local e sem odômetro. O consumo médio pode mudar.")
         }
     }
 }

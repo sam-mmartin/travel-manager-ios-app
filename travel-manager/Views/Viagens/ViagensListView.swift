@@ -12,6 +12,14 @@ struct ViagensListView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \Viagem.criadaEm, order: .reverse) private var viagens: [Viagem]
     @State private var criando = false
+    @State private var viagemParaExcluir: Viagem?
+    
+    private var confirmandoExclusao: Binding<Bool> {
+        Binding(
+            get: { viagemParaExcluir != nil },
+            set: { if !$0 { viagemParaExcluir = nil } }
+        )
+    }
  
     var body: some View {
         NavigationStack {
@@ -24,13 +32,9 @@ struct ViagensListView: View {
                                 .font(.subheadline).foregroundStyle(.secondary)
                         }
                     }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                        Button(role: .destructive) {
-                            context.delete(viagem)
-                        } label: {
-                            Label("Excluir", systemImage: "trash")
-                        }
-                    }
+                    .swipeExcluir(confirmar: true,
+                                  pedir: { viagemParaExcluir = viagem },
+                                  excluir: { context.delete(viagem) })
                 }
              }
             .overlay {
@@ -52,6 +56,31 @@ struct ViagensListView: View {
             .sheet(isPresented: $criando) {
                 NovaViagemView()
             }
+            .confirmationDialog("Excluir esta viagem?",
+                                isPresented: confirmandoExclusao,
+                                titleVisibility: .visible,
+                                presenting: viagemParaExcluir) { viagem in
+                Button("Excluir viagem e todos os dados", role: .destructive) {
+                    context.delete(viagem)
+                }
+                Button("Cancelar", role: .cancel) { }
+            } message: { viagem in
+                Text("Pontos, despesas e paradas de \"" + viagem.nome + "\" serão apagados. Não é possível desfazer.")
+            }
         }
     }
+}
+
+#Preview {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: Viagem.self, configurations: config)
+
+    let viagens = [
+        Viagem(nome: "Road trip SP → RJ"),
+        Viagem(nome: "Viagem para Floripa"),
+    ]
+    viagens.forEach { container.mainContext.insert($0) }
+
+    return ViagensListView()
+        .modelContainer(container)
 }

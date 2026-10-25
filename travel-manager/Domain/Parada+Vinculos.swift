@@ -8,8 +8,27 @@ import Foundation
 
 extension Parada {
     var listaDespesas: [Despesa] { despesas ?? [] }
+    static let horasParaAviso: Double = 6
     
     var emAndamento: Bool { fim == nil }
+    
+    var paradaLonga: Bool {
+        emAndamento && duracao > Parada.horasParaAviso * 3600
+    }
+    
+    var temVinculos: Bool {
+        ponto != nil || !listaDespesas.isEmpty
+    }
+    
+    var exigeConfirmacaoAoExcluir: Bool {
+        temVinculos
+    }
+    
+    var resumoDespesas: String {
+        let n = listaDespesas.count
+        
+        return n == 1 ? "1 despesa" : "\(n) despesas"
+    }
     
     var totalGasto: Decimal {
         var soma: Decimal = 0
@@ -35,9 +54,46 @@ extension Parada {
         return "Parada"
     }
     
+    var mensagemExclusao: String {
+        var partes: [String] = []
+        
+        if let ponto {
+            partes.append("Ela está ligada ao ponto \(ponto.nome), que perde esse tempo parado.")
+        }
+        
+        let n = listaDespesas.count
+        
+        if n == 1 {
+            partes.append("A despesa ligada a ela continua no app, mas fica sem parada.")
+        } else if n > 1 {
+            partes.append("As \(n) despesas ligadas a ela continuam no app, mas ficam sem parada.")
+        }
+        
+        partes.append("O tempo parado da viagem diminui em " + formatarDuracao(duracao) + ".")
+        
+        return partes.joined(separator: " ")
+    }
+    
+    static func localApos(trocarPara novo: Ponto?,
+                          de anterior: Ponto?,
+                          local atual: String) -> String {
+        guard let novo else {
+            return atual
+        }
+        
+        let texto = atual.limpo
+        
+        if texto.isEmpty || texto == anterior?.nome.limpo {
+            return novo.nome
+        }
+        
+        return atual
+    }
+    
     func definirPonto(_ novo: Ponto?) {
         let anterior = ponto
         ponto = novo
+        
         guard let novo else {
             return
         }
@@ -46,11 +102,8 @@ extension Parada {
             d.ponto = novo
         }
         
-        let localAtual = local.limpo
-        let veioDoPontoAnterior = localAtual == anterior?.nome.limpo
-        
-        if localAtual.isEmpty || veioDoPontoAnterior {
-            local = novo.nome
-        }
+        local = Parada.localApos(trocarPara: novo,
+                                 de: anterior,
+                                 local: local)
     }
 }

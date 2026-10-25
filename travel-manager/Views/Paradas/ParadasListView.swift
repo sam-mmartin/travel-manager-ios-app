@@ -12,6 +12,7 @@ struct ParadasListView: View {
     let viagem: Viagem
     @Environment(\.modelContext) private var context
     @State private var paradaEditando: Parada?
+    @State private var paradaParaExcluir: Parada?
     
     private var ordenadas: [Parada] {
         viagem.paradasOrdenadas
@@ -28,13 +29,9 @@ struct ParadasListView: View {
                     ParadaRowView(parada: p)
                         .contentShape(Rectangle())
                         .onTapGesture { paradaEditando = p }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                context.delete(p)
-                            } label: {
-                                Label("Excluir", systemImage: "trash")
-                            }
-                        }
+                        .swipeExcluir(confirmar: p.exigeConfirmacaoAoExcluir,
+                                      pedir: { paradaParaExcluir = p },
+                                      excluir: { context.delete(p) })
                 }
             }
         }
@@ -47,6 +44,11 @@ struct ParadasListView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $paradaEditando) { p in
             ParadaEditView(parada: p)
+        }
+        .confirmarExclusao(de: $paradaParaExcluir,
+                           titulo: "Excluir esta parada?",
+                           botao: "Excluir parada") { parada in
+            parada.mensagemExclusao
         }
     }
 }

@@ -9,6 +9,7 @@ import SwiftData
 
 struct PontoDetailView: View {
     let ponto: Ponto
+    @State private var editando = false
     
     private var horarioTexto: String {
         ponto.horario.formatted(date: .abbreviated,
@@ -68,6 +69,14 @@ struct PontoDetailView: View {
         }
         .navigationTitle(ponto.nome)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            Button("Editar") { editando = true }
+        }
+        .sheet(isPresented: $editando) {
+            if let viagem = ponto.viagem {
+                PontoFormView(viagem: viagem, editando: ponto)
+            }
+        }
     }
 }
 
